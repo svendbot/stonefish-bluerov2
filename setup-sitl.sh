@@ -24,7 +24,7 @@ fi
 #    in the bind-mounted host home, not in the ephemeral container.
 #    python3-wxgtk4.0 is required by MAVProxy's `--map` module.
 echo "==> installing python3-wxgtk4.0 (apt, needed by MAVProxy map module)"
-sudo apt install -y python3-wxgtk4.0
+sudo apt-get install -y python3-wxgtk4.0
 echo "==> installing MAVProxy / pymavlink (user pip)"
 # Pin numpy <2 — the system cv2 (4.6) was compiled against numpy 1.x, and
 # MAVProxy pulls in numpy as a dep. Without the pin, pip grabs numpy 2.x and
