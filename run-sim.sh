@@ -32,7 +32,7 @@ fi
 # then tries `tmux new-window` against the host socket from inside the
 # container, which silently fails and ardusub never launches.  Unset it so
 # RiTW falls through to the "log to /tmp/ArduSub.log" path.
-SITL_CMD='unset TMUX; sim_vehicle.py -v ArduSub --model JSON --map -L PHILL -m --streamrate=-1'
+SITL_CMD='unset TMUX; sim_vehicle.py -v ArduSub --model JSON --map -L PHILL -A "--sim-port-out=9012" -m --streamrate=-1'
 BRIDGE_CMD='source ~/stonefish/ws/install/setup.bash && ros2 launch stonefish_bluerov2 bluerov2_sim.py'
 
 # Pane 0: SITL.  Pane 1: Stonefish + bridge.

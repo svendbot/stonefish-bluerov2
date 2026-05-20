@@ -3,6 +3,13 @@
 # Idempotent — safe to re-run.
 set -euo pipefail
 
+# Strip leaked host Nix paths so python3/pip resolve to the container's.
+# PYTHONNOUSERSITE leaks from the Nix devShell and hides ~/.local/lib/pythonX.Y;
+# unset it so the --user pip installs below are actually importable.
+PATH="$(printf %s "$PATH" | tr ':' '\n' | grep -v '^/nix/' | paste -sd:)"
+export PATH
+unset PYTHONPATH PYTHONHOME PYTHONNOUSERSITE
+
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARDUPILOT_DIR="$HERE/ardupilot"
 WS_DIR="$HERE/ws"
@@ -15,8 +22,15 @@ fi
 
 # 1. ArduPilot Python tooling (MAVProxy + pymavlink). Use --user so it lands
 #    in the bind-mounted host home, not in the ephemeral container.
+#    python3-wxgtk4.0 is required by MAVProxy's `--map` module.
+echo "==> installing python3-wxgtk4.0 (apt, needed by MAVProxy map module)"
+sudo apt install -y python3-wxgtk4.0
 echo "==> installing MAVProxy / pymavlink (user pip)"
-pip install --user --break-system-packages MAVProxy pymavlink
+# Pin numpy <2 — the system cv2 (4.6) was compiled against numpy 1.x, and
+# MAVProxy pulls in numpy as a dep. Without the pin, pip grabs numpy 2.x and
+# `import cv2` crashes, which silently disables the map module.
+pip install --user --break-system-packages 'numpy<2' MAVProxy pymavlink
+pip install --user --break-system-packages 'empy==3.3.4'
 
 # 2. PATH for ~/.local/bin and ArduPilot Tools/autotest is set by the
 #    image's /etc/profile.d/stonefish-ros.sh — nothing to do at the host
