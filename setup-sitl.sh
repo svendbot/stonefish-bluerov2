@@ -10,6 +10,18 @@ PATH="$(printf %s "$PATH" | tr ':' '\n' | grep -v '^/nix/' | paste -sd:)"
 export PATH
 unset PYTHONPATH PYTHONHOME PYTHONNOUSERSITE
 
+# Same class of leak: an activated host venv (VIRTUAL_ENV + its bin/ on PATH)
+# survives `distrobox enter`, but its `deactivate` shell function does not —
+# so the user can't undo it from inside the box. Strip it ourselves: pip --user
+# below would otherwise be shadowed by the venv's site-packages and refuse.
+if [ -n "${VIRTUAL_ENV:-}" ]; then
+  echo "==> stripping leaked host venv ($VIRTUAL_ENV) from PATH"
+  PATH="$(printf %s "$PATH" | tr ':' '\n' | grep -vF "$VIRTUAL_ENV/" | paste -sd:)"
+  export PATH
+  unset VIRTUAL_ENV VIRTUAL_ENV_PROMPT
+  hash -r 2>/dev/null || true
+fi
+
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARDUPILOT_DIR="$HERE/ardupilot"
 WS_DIR="$HERE/ws"
