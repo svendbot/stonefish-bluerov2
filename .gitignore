@@ -1,0 +1,31 @@
+# Externally cloned (see README "Setup")
+/ardupilot/
+/ws/src/stonefish_bluerov2/
+/qgc/QGroundControl.AppImage
+/qgc/squashfs-root/
+
+# colcon outputs
+/ws/build/
+/ws/install/
+/ws/log/
+
+# SITL runtime artifacts
+/logs/
+/mav.parm
+/mav.tlog
+/mav.tlog.raw
+/eeprom.bin
+
+# Nix
+/.direnv/
+/result
+/result-*
+
+# Editors / OS
+*.swp
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
